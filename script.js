@@ -8,32 +8,31 @@ class Paper {
     this.currentY = 0;
     this.startX = 0;
     this.startY = 0;
-    this.velX = 0;
-    this.velY = 0;
-    this.rotation = Math.random() * 30 - 15;
-    this.moving = false;
-    this.animationFrame = null;
+    this.offsetX = 0;
+    this.offsetY = 0;
     
     this.init();
   }
 
-  move() {
-    if (!this.moving) return;
-    
-    this.currentX += this.velX;
-    this.currentY += this.velY;
+  disableScroll() {
+    document.body.style.overflow = "hidden"; // 🔥 Disable scrolling
+    document.body.style.touchAction = "none"; // 🔥 Prevent touch gestures
+  }
 
-    this.paper.style.transform = `translate(${this.currentX}px, ${this.currentY}px) rotate(${this.rotation}deg)`;
-    this.animationFrame = requestAnimationFrame(() => this.move());
+  enableScroll() {
+    document.body.style.overflow = ""; // 🔥 Re-enable scrolling
+    document.body.style.touchAction = ""; // 🔥 Reset touch gestures
   }
 
   start(e) {
     if (this.holdingPaper) return;
     this.holdingPaper = true;
-    this.moving = true;
+
+    this.disableScroll(); // Prevent scrolling while dragging
+
     this.paper.style.zIndex = highestZ++;
-    
     let clientX, clientY;
+
     if (e.touches) {
       clientX = e.touches[0].clientX;
       clientY = e.touches[0].clientY;
@@ -42,20 +41,17 @@ class Paper {
       clientY = e.clientY;
     }
 
-    this.startX = clientX;
-    this.startY = clientY;
-
-    this.velX = 0;
-    this.velY = 0;
+    // Store offset from touch/mouse position to element's current position
+    this.offsetX = clientX - this.currentX;
+    this.offsetY = clientY - this.currentY;
 
     document.addEventListener("mousemove", this.moveHandler);
     document.addEventListener("touchmove", this.moveHandler, { passive: false });
-    
-    this.animationFrame = requestAnimationFrame(() => this.move());
   }
 
   moveHandler = (e) => {
     let clientX, clientY;
+
     if (e.touches) {
       clientX = e.touches[0].clientX;
       clientY = e.touches[0].clientY;
@@ -64,17 +60,16 @@ class Paper {
       clientY = e.clientY;
     }
 
-    this.velX = (clientX - this.startX) * 0.4; // Reduce movement speed slightly
-    this.velY = (clientY - this.startY) * 0.4;
+    // Move the paper directly under the touch/mouse
+    this.currentX = clientX - this.offsetX;
+    this.currentY = clientY - this.offsetY;
 
-    this.startX = clientX;
-    this.startY = clientY;
+    this.paper.style.transform = `translate(${this.currentX}px, ${this.currentY}px)`;
   };
 
   end() {
     this.holdingPaper = false;
-    this.moving = false;
-    cancelAnimationFrame(this.animationFrame);
+    this.enableScroll(); // Re-enable scrolling
 
     document.removeEventListener("mousemove", this.moveHandler);
     document.removeEventListener("touchmove", this.moveHandler);
