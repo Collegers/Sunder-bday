@@ -1,0 +1,59 @@
+/* Basic Styling */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    overflow-x: hidden; /* Disable horizontal scroll */
+}
+
+/* Centering the gallery */
+.gallery-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Change to flex-start so images align from the top */
+    height: 100vh;
+    padding: 20px;
+    overflow-y: auto; /* Allow vertical scrolling */
+    width: 100%;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid layout */
+    gap: 15px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+/* Each gallery item */
+.gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Image styling */
+.gallery-item img {
+    width: 100%;
+    height: auto;  /* Make sure the image aspect ratio is maintained */
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+/* Hover effect */
+.gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+/* Add a nice smooth transition effect */
+.gallery-item img:active {
+    transform: scale(1.05);
+}
+
+/* Responsive breakpoints */
+@media (max-width: 600px) {
+    .gallery {
+        grid-template-columns: 1fr; /* Stack images on mobile */
+    }
+}
